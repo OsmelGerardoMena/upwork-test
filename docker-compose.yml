@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: realestate_backend
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=9000
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: realestate_frontend
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # VITE_API_URL se omite intencionalmente aquí:
+      # el proxy de Vite (vite.config.js) redirige /api → backend:9000
+      # internamente, sin exponer la URL al browser y sin CORS.
+    depends_on:
+      - backend
+    restart: unless-stopped
